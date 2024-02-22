@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Notepad Generator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #1a202c;
+      color: #ffffff;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #sidebar {
+      width: 50%;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    #content {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .category {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .button {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px;
+      background-color: #39414d;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #2d3340;
+    }
+
+    .button:active {
+      background-color: #8b5a5a;
+    }
+
+    #textarea-container {
+      width: 100%;
+      position: relative;
+    }
+
+    #textarea {
+      width: 100%;
+      height: calc(100vh - 100px);
+      margin-top: 10px;
+      background-color: #2d3748;
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      resize: none;
+    }
+
+    #action-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    #copy-btn,
+    #clear-btn {
+      background-color: #4a5568;
+      color: #ffffff;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #copy-btn:hover,
+    #clear-btn:hover {
+      background-color: #2d3748;
+    }
+
+    #print-links {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+      align-items: center;
+    }
+
+    .print-link {
+      color: #63b3ed;
+      cursor: pointer;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="sidebar">
+    <!-- JavaScript will populate categories and buttons here -->
+  </div>
+
+  <div id="content">
+    <div id="textarea-container">
+      <textarea id="textarea" placeholder="Click a button on the left to add text..."></textarea>
+      <div id="action-buttons">
+        <button id="copy-btn">Copy Text</button>
+        <button id="clear-btn">Clear</button>
+      </div>
+    </div>
+    <div id="print-links">
+      <!-- Cleared notepads will be dynamically added here -->
+    </div>
+  </div>
+
+  <script>
+
+    function getDate() {
+      const options = {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+      };
+
+      return new Date().toLocaleString('en-US', options);
+    }
+
+    function updateDate() {
+      date = getDate();
+    }
+
+    var date = updateDate();
+    updateDate();
+    setInterval(updateDate, 15 * 60 * 1000);
+
+    const content = [
+        {
+          "category": "Category  1",
+          "buttons": [
+            {
+              "button": "Sample Button  1",
+              "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+            },
+            {
+              "button": "Sample Button  2",
+              "text": "Vivamus lacinia arcu eget nulla malesuada."
+            },
+            {
+              "button": "Sample Button  3",
+              "text": "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."
+            }
+          ]
+        },
+        {
+          "category": "Category  2",
+          "buttons": [
+            {
+              "button": "Sample Button  4",
+              "text": "Curabitur non nulla sit amet nisl tempus convallis quis ac lectus."
+            },
+            {
+              "button": "Sample Button  5",
+              "text": "Donec sollicitudin molestie malesuada."
+            },
+            {
+              "button": "Sample Button  6",
+              "text": "Quisque velit nisi, pretium ut lacinia in, elementum id enim."
+            },
+            {
+              "button": "Sample Button  7",
+              "text": "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae."
+            }
+          ]
+        },
+        {
+          "category": "Category  3",
+          "buttons": [
+            {
+              "button": "Sample Button  8",
+              "text": "Sed posuere consectetur est at lobortis."
+            },
+            {
+              "button": "Sample Button  9",
+              "text": "Donec ullamcorper nulla non metus auctor fringilla."
+            },
+            {
+              "button": "Sample Button  10",
+              "text": "Cras justo odio, dapibus ac facilisis in, egestas eget quam."
+            },
+            {
+              "button": "Sample Button  11",
+              "text": "Maecenas sed diam eget risus varius blandit sit amet non magna."
+            },
+            {
+              "button": "Sample Button  12",
+              "text": "Etiam porta sem malesuada magna mollis euismod."
+            }
+          ]
+        }
+      ]
+
+
+    const sidebar = document.getElementById('sidebar');
+    const textarea = document.getElementById('textarea');
+    const copyBtn = document.getElementById('copy-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const printLinksContainer = document.getElementById('print-links');
+    let clearedTexts = [];
+
+    // Populate categories and buttons
+    content.forEach(categoryObj => {
+      const categoryDiv = document.createElement('div');
+      categoryDiv.classList.add('category');
+      categoryDiv.textContent = categoryObj.category;
+      sidebar.appendChild(categoryDiv);
+
+      categoryObj.buttons.forEach(buttonObj => {
+        const button = document.createElement('button');
+        button.classList.add('button');
+        button.textContent = buttonObj.button;
+
+        button.addEventListener('click', () => {
+          // Copy text to clipboard
+          navigator.clipboard.writeText(buttonObj.text);
+
+          // Flash the button
+          button.classList.add('bg-yellow-500');
+          setTimeout(() => {
+            button.classList.remove('bg-yellow-500');
+          }, 200);
+
+          // Change button color to reddish-gray when active
+          button.style.backgroundColor = '#8b5a5a';
+
+          // Add text to the textarea at the cursor position
+          const cursorPos = textarea.selectionStart;
+          const textBefore = textarea.value.substring(0, cursorPos);
+          const textAfter = textarea.value.substring(cursorPos);
+          textarea.value = textBefore + buttonObj.text + textAfter;
+
+          // Set focus and position cursor after the inserted text
+          textarea.focus();
+          textarea.setSelectionRange(cursorPos + buttonObj.text.length, cursorPos + buttonObj.text.length);
+
+          // Update URL with textarea content
+          updateUrlParams();
+        });
+
+        sidebar.appendChild(button);
+      });
+    });
+
+    // Copy text in the textarea to clipboard
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(textarea.value);
+
+      // Flash the button
+      copyBtn.classList.add('bg-yellow-500');
+      setTimeout(() => {
+        copyBtn.classList.remove('bg-yellow-500');
+      }, 200);
+    });
+
+    // Clear the entire content of the textarea
+    clearBtn.addEventListener('click', () => {
+      // Reset the slightly darker color of the buttons
+      document.querySelectorAll('.button').forEach(button => {
+        button.style.backgroundColor = '#39414d';
+      });
+
+      // Save the cleared text
+      const clearedText = textarea.value;
+      if (clearedText) {
+        clearedTexts.push({ text: clearedText, time: getTime() });
+        if (clearedTexts.length > 10) {
+          // Keep only the last 3 cleared texts
+          clearedTexts.shift();
+        }
+
+        // Display print links
+        updatePrintLinks();
+      }
+
+      // Clear the textarea
+      textarea.value = '';
+
+      // Update URL with textarea content
+      updateUrlParams();
+    });
+
+    // Display print links
+    function updatePrintLinks() {
+  printLinksContainer.innerHTML = '';
+  clearedTexts.forEach((clearedText, index) => {
+    const printLink = document.createElement('div');
+    printLink.classList.add('print-link');
+    printLink.textContent = `Note from ${clearedText.time}`;
+    printLink.onclick = () => {
+      // Set the textarea content to the cleared text
+      textarea.value = clearedText.text;
+    };
+    printLinksContainer.appendChild(printLink);
+  });
+    }
+
+    // Get current time in "hour:min:sec" format
+    function getTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
+    // Update URL with textarea content
+    function updateUrlParams() {
+      const encodedText = encodeURIComponent(textarea.value);
+      history.replaceState({}, document.title, `?text=${encodedText}`);
+    }
+
+    // Initialize textarea content from URL parameter
+    function initializeFromUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const encodedText = urlParams.get('text');
+      if (encodedText) {
+        // Decode and set textarea content
+        textarea.value = decodeURIComponent(encodedText);
+      }
+    }
+
+    // Initialize textarea content from URL parameter on page load
+    initializeFromUrlParams();
+
+    // Update URL when the textarea content changes
+    textarea.addEventListener('input', updateUrlParams);
+  </script>
+</body>
+
+</html>
